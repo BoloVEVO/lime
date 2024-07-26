@@ -2,6 +2,9 @@
 #include "SDLGamepad.h"
 #include "SDLJoystick.h"
 #include <system/System.h>
+#include <thread>
+#include <chrono>
+#include <iostream>
 
 #ifdef HX_MACOS
 #include <CoreFoundation/CoreFoundation.h>
@@ -22,6 +25,8 @@ namespace lime {
 	std::map<int, std::map<int, int> > gamepadsAxisMap;
 	bool inBackground = false;
 
+	uint64_t lastUpdateEvent;
+	uint64_t lastScheduledTicks;
 
 	SDLApplication::SDLApplication () {
 
@@ -40,11 +45,12 @@ namespace lime {
 
 		currentApplication = this;
 
-		framePeriod = 1000.0 / 60.0;
+		fps = 60;
 
-		currentUpdate = 0;
-		lastUpdate = 0;
-		nextUpdate = 0;
+		limitfps = true;
+
+		currentUpdate = 0.0;
+		lastUpdate = 0.0;
 
 		ApplicationEvent applicationEvent;
 		ClipboardEvent clipboardEvent;
@@ -113,7 +119,6 @@ namespace lime {
 
 	}
 
-
 	void SDLApplication::HandleEvent (SDL_Event* event) {
 
 		#if defined(IPHONE) || defined(EMSCRIPTEN)
@@ -128,23 +133,11 @@ namespace lime {
 			case SDL_USEREVENT:
 
 				if (!inBackground) {
-
-					currentUpdate = SDL_GetTicks ();
 					applicationEvent.type = UPDATE;
-					applicationEvent.deltaTime = currentUpdate - lastUpdate;
-					lastUpdate = currentUpdate;
-
-					nextUpdate += framePeriod;
-
-					while (nextUpdate <= currentUpdate) {
-
-						nextUpdate += framePeriod;
-
-					}
+					applicationEvent.deltaTime = (((double) currentUpdate - (double) lastUpdate) / (double)SDL_GetPerformanceFrequency())*1e+3;
 
 					ApplicationEvent::Dispatch (&applicationEvent);
 					RenderEvent::Dispatch (&renderEvent);
-
 				}
 
 				break;
@@ -325,13 +318,15 @@ namespace lime {
 
 	}
 
-
 	void SDLApplication::Init () {
 
 		active = true;
-		lastUpdate = SDL_GetTicks ();
-		nextUpdate = lastUpdate;
 
+		uint64_t ticks = SDL_GetPerformanceCounter();
+
+		lastUpdate = ticks;
+		lastUpdateEvent = lastUpdate;
+		lastScheduledTicks = ticks;
 	}
 
 
@@ -473,7 +468,6 @@ namespace lime {
 
 					}
 					break;
-
 
 				case SDL_JOYBUTTONDOWN:
 
@@ -811,25 +805,18 @@ namespace lime {
 
 
 	void SDLApplication::SetFrameRate (double frameRate) {
+		fps = static_cast<int>(abs(frameRate));
+	}
 
-		if (frameRate > 0) {
-
-			framePeriod = 1000.0 / frameRate;
-
-		} else {
-
-			framePeriod = 1000.0;
-
-		}
-
+	void SDLApplication::LimitFPS (bool limit){
+		limitfps = limit;
 	}
 
 
-	static SDL_TimerID timerID = 0;
-	bool timerActive = false;
 	bool firstTime = true;
 
-	Uint32 OnTimer (Uint32 interval, void *) {
+	int OnTimer ()
+	{
 
 		SDL_Event event;
 		SDL_UserEvent userevent;
@@ -840,15 +827,10 @@ namespace lime {
 		event.type = SDL_USEREVENT;
 		event.user = userevent;
 
-		timerActive = false;
-		timerID = 0;
-
 		SDL_PushEvent (&event);
 
 		return 0;
-
 	}
-
 
 	bool SDLApplication::Update () {
 
@@ -861,6 +843,7 @@ namespace lime {
 
 			firstTime = false;
 
+			currentUpdate = SDL_GetPerformanceCounter();
 			HandleEvent (&event);
 			event.type = -1;
 			if (!active)
@@ -868,44 +851,60 @@ namespace lime {
 
 		#endif
 
+			currentUpdate = SDL_GetPerformanceCounter();
+
 			while (SDL_PollEvent (&event)) {
 
 				HandleEvent (&event);
 				event.type = -1;
 				if (!active)
 					return active;
-
 			}
 
-			currentUpdate = SDL_GetTicks ();
+			uint64_t curTicks = currentUpdate;
 
-		#if defined (IPHONE) || defined (EMSCRIPTEN)
+			if (limitfps)
+			{
+				uint64_t frequency = SDL_GetPerformanceFrequency();
+				int ticks_to_wait = static_cast<int>(frequency/fps);
 
-			if (currentUpdate >= nextUpdate) {
+				bool done = false;
 
-				event.type = SDL_USEREVENT;
-				HandleEvent (&event);
-				event.type = -1;
+				while(!done)
+				{
+					curTicks = SDL_GetPerformanceCounter();
+					int ticks_passed = static_cast<int>(curTicks-lastScheduledTicks);
 
+					int ticks_left = ticks_to_wait - ticks_passed;
+
+					if (curTicks < lastScheduledTicks)
+						done = true;
+
+					if (ticks_passed >= ticks_to_wait)
+						done = true;
+
+					if (!done)
+					{
+						int scheduled_ticks = static_cast<int>((SDL_GetPerformanceFrequency()+499)/500);
+
+						if (ticks_left >scheduled_ticks)
+							std::this_thread::sleep_for(std::chrono::milliseconds(1));
+						else
+							for (int i=0;i<10;i++) // Give up time slice using sleep(0) 10 times
+								std::this_thread::sleep_for(std::chrono::milliseconds(0));
+					}
+				}
+
+				OnTimer();
+			}
+			else
+			{
+				OnTimer();
 			}
 
-		#else
-
-			if (currentUpdate >= nextUpdate) {
-
-				if (timerActive) SDL_RemoveTimer (timerID);
-				OnTimer (0, 0);
-
-			} else if (!timerActive) {
-
-				timerActive = true;
-				timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
-
-			}
-
+			lastUpdate = currentUpdate;
+			lastScheduledTicks = curTicks;
 		}
-
-		#endif
 
 		return active;
 

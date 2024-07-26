@@ -46,6 +46,8 @@ class Window
 	**/
 	public var frameRate(get, set):Float;
 
+	public var limitFramerate(get, set):Bool;
+
 	public var fullscreen(get, set):Bool;
 	public var height(get, set):Int;
 	public var hidden(get, null):Bool;
@@ -117,6 +119,7 @@ class Window
 	@:noCompletion private var __scale:Float;
 	@:noCompletion private var __title:String;
 	@:noCompletion private var __visible:Bool;
+	@:noCompletion private var __vsync:Bool;
 	@:noCompletion private var __width:Int;
 	@:noCompletion private var __x:Int;
 	@:noCompletion private var __y:Int;
@@ -168,6 +171,7 @@ class Window
 		__height = 0;
 		__fullscreen = false;
 		__scale = 1;
+		__vsync = ((__attributes.context != null && Reflect.hasField(__attributes.context, "vsync")) ? __attributes.context.vsync : false);
 		__x = 0;
 		__y = 0;
 		__title = Reflect.hasField(__attributes, "title") ? __attributes.title : "";
@@ -439,7 +443,8 @@ class Window
 
 		__minWidth = width;
 		__minHeight = height;
-		if (__width < __minWidth || __height < __minHeight) {
+		if (__width < __minWidth || __height < __minHeight)
+		{
 			resize(__width, __height);
 		}
 	}
@@ -450,7 +455,8 @@ class Window
 
 		__maxWidth = width;
 		__maxHeight = height;
-		if (__width > __maxWidth || __height > __maxHeight) {
+		if (__width > __maxWidth || __height > __maxHeight)
+		{
 			resize(__width, __height);
 		}
 	}
@@ -519,6 +525,16 @@ class Window
 	@:noCompletion private inline function set_frameRate(value:Float):Float
 	{
 		return __backend.setFrameRate(value);
+	}
+
+	@:noCompletion private inline function set_limitFramerate(value:Bool):Bool
+	{
+		return __backend.setLimitFramerate(value);
+	}
+
+	@:noCompletion private inline function get_limitFramerate(value:Bool):Bool
+	{
+		return __backend.getLimitFramerate(value);
 	}
 
 	@:noCompletion private inline function get_fullscreen():Bool
@@ -685,6 +701,16 @@ class Window
 	{
 		__visible = __backend.setVisible(value);
 		return __visible;
+	}
+
+	@:noCompletion private inline function get_vsync():Bool
+	{
+		return __vsync;
+	}
+
+	@:noCompletion private inline function set_vsync(value:Bool):Bool
+	{
+		return __vsync = __backend.setVSync(value);
 	}
 
 	@:noCompletion private inline function get_width():Int

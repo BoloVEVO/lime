@@ -360,6 +360,22 @@ namespace lime {
 	}
 
 
+	void lime_application_limit_frame_rate (value application, bool limitfps) {
+
+		Application* app = (Application*)val_data (application);
+		app->LimitFPS (limitfps);
+
+	}
+
+
+	HL_PRIM void HL_NAME(hl_application_limit_frame_rate) (HL_CFFIPointer* application, bool limitfps) {
+
+		Application* app = (Application*)application->ptr;
+		app->LimitFPS (limitfps);
+
+	}
+
+
 	bool lime_application_update (value application) {
 
 		Application* app = (Application*)val_data (application);
@@ -3845,6 +3861,22 @@ namespace lime {
 	}
 
 
+	bool lime_window_set_vsync (value window, bool vsync) {
+
+		Window* targetWindow = (Window*)val_data(window);
+		return targetWindow->SetVSync (vsync);
+
+	}
+
+
+	HL_PRIM bool HL_NAME(hl_window_set_vsync) (HL_CFFIPointer* window, bool vsync) {
+
+		Window* targetWindow = (Window*)window->ptr;
+		return targetWindow->SetVSync (vsync);
+
+	}
+
+
 	void lime_window_warp_mouse (value window, int x, int y) {
 
 		Window* targetWindow = (Window*)val_data (window);
@@ -3923,6 +3955,7 @@ namespace lime {
 	DEFINE_PRIME1v (lime_application_init);
 	DEFINE_PRIME1 (lime_application_quit);
 	DEFINE_PRIME2v (lime_application_set_frame_rate);
+	DEFINE_PRIME2v (lime_application_limit_frame_rate);
 	DEFINE_PRIME1 (lime_application_update);
 	DEFINE_PRIME2 (lime_audio_load);
 	DEFINE_PRIME2 (lime_audio_load_bytes);
@@ -4068,6 +4101,7 @@ namespace lime {
 	DEFINE_PRIME2v (lime_window_set_text_input_rect);
 	DEFINE_PRIME2 (lime_window_set_title);
 	DEFINE_PRIME2 (lime_window_set_visible);
+	DEFINE_PRIME2 (lime_window_set_vsync);
 	DEFINE_PRIME3v (lime_window_warp_mouse);
 	DEFINE_PRIME1 (lime_window_get_opacity);
 	DEFINE_PRIME2v (lime_window_set_opacity);
@@ -4077,7 +4111,7 @@ namespace lime {
 
 	#define _ENUM "?"
 	// #define _TCFFIPOINTER _ABSTRACT (HL_CFFIPointer)
-	#define _TAPPLICATION_EVENT _OBJ (_I32 _I32)
+	#define _TAPPLICATION_EVENT _OBJ (_F64 _I32)
 	#define _TBYTES _OBJ (_I32 _BYTES)
 	#define _TCFFIPOINTER _DYN
 	#define _TCLIPBOARD_EVENT _OBJ (_I32)
@@ -4112,6 +4146,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_VOID, hl_application_init, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_I32, hl_application_quit, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_application_set_frame_rate, _TCFFIPOINTER _F64);
+	DEFINE_HL_PRIM (_VOID, hl_application_limit_frame_rate, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_BOOL, hl_application_update, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_TAUDIOBUFFER, hl_audio_load_bytes, _TBYTES _TAUDIOBUFFER);
 	DEFINE_HL_PRIM (_TAUDIOBUFFER, hl_audio_load_file, _STRING _TAUDIOBUFFER);
@@ -4256,6 +4291,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_VOID, hl_window_set_text_input_rect, _TCFFIPOINTER _TRECTANGLE);
 	DEFINE_HL_PRIM (_STRING, hl_window_set_title, _TCFFIPOINTER _STRING);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_visible, _TCFFIPOINTER _BOOL);
+	DEFINE_HL_PRIM (_BOOL, hl_window_set_vsync, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_VOID, hl_window_warp_mouse, _TCFFIPOINTER _I32 _I32);
 	DEFINE_HL_PRIM (_F64, hl_window_get_opacity, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_window_set_opacity, _TCFFIPOINTER _F64);

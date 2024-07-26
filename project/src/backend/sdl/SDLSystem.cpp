@@ -546,8 +546,11 @@ namespace lime {
 
 	double System::GetTimer () {
 
-		return SDL_GetTicks ();
-
+		uint64_t ticks = SDL_GetPerformanceCounter();
+		uint64_t frequency = SDL_GetPerformanceFrequency();
+		double seconds = (double)ticks / (double)frequency;
+		
+		return seconds*1000;
 	}
 
 

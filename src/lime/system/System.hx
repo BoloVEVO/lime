@@ -318,24 +318,29 @@ class System
 		return null;
 	}
 
+	public static var lastTimer:Float = 0;
+
 	/**
 		The number of milliseconds since the application was initialized.
 	**/
-	public static function getTimer():Int
+	public static function getTimer():Float
 	{
+		var timer:Float = 0;
 		#if flash
-		return flash.Lib.getTimer();
+		timer = flash.Lib.getTimer();
 		#elseif ((js && !nodejs) || electron)
-		return Std.int(Browser.window.performance.now());
+		timer = Browser.window.performance.now();
 		#elseif (lime_cffi && !macro)
-		return cast NativeCFFI.lime_system_get_timer();
+		timer = NativeCFFI.lime_system_get_timer();
 		#elseif cpp
-		return Std.int(untyped __global__.__time_stamp() * 1000);
+		timer = untyped __global__.__time_stamp() * 1000;
 		#elseif sys
-		return Std.int(Sys.time() * 1000);
-		#else
-		return 0;
+		timer = Sys.time() * 1000;
 		#end
+
+		lastTimer = timer;
+
+		return timer;
 	}
 
 	#if (!lime_doc_gen || lime_cffi)
@@ -858,7 +863,9 @@ class System
 	}
 }
 
-#if (haxe_ver >= 4.0) private enum #else @:enum private #end abstract SystemDirectory(Int) from Int to Int from UInt to UInt
+#if (haxe_ver >= 4.0) private enum #else @:enum
+
+private #end abstract SystemDirectory(Int) from Int to Int from UInt to UInt
 {
 	var APPLICATION = 0;
 	var APPLICATION_STORAGE = 1;

@@ -427,6 +427,11 @@ class HTML5Window
 		}
 	}
 
+	public function getLimitFramerate():Bool
+	{
+		return false;
+	}
+
 	public function getMouseLock():Bool
 	{
 		return false;
@@ -480,7 +485,8 @@ class HTML5Window
 	private function handleCutOrCopyEvent(event:ClipboardEvent):Void
 	{
 		var text = Clipboard.text;
-		if (text == null) {
+		if (text == null)
+		{
 			text = "";
 		}
 		event.clipboardData.setData("text/plain", text);
@@ -1061,6 +1067,11 @@ class HTML5Window
 		return value;
 	}
 
+	public function setLimitFramerate(value:Bool):Bool
+	{
+		return false;
+	}
+
 	public function setFullscreen(value:Bool):Bool
 	{
 		if (value)
@@ -1239,7 +1250,6 @@ class HTML5Window
 				textInput.removeEventListener('paste', handlePasteEvent, true);
 				textInput.removeEventListener('compositionstart', handleCompositionstartEvent, true);
 				textInput.removeEventListener('compositionend', handleCompositionendEvent, true);
-
 			}
 		}
 
@@ -1272,6 +1282,11 @@ class HTML5Window
 		}
 
 		return value;
+	}
+
+	public function setVSync(value:Bool):Bool
+	{
+		return false;
 	}
 
 	public function setVisible(value:Bool):Bool

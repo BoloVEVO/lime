@@ -225,8 +225,7 @@ class FlashWindow
 				"middleMouseMove",
 				"middleMouseUp"
 				#if ((!openfl && !disable_flash_right_click)
-					|| enable_flash_right_click), "rightMouseDown", "rightMouseMove", "rightMouseUp"
-				#end
+					|| enable_flash_right_click), "rightMouseDown", "rightMouseMove", "rightMouseUp" #end
 			];
 
 			for (event in events)
@@ -567,6 +566,11 @@ class FlashWindow
 		return frameRate;
 	}
 
+	public function getLimitFramerate():Bool
+	{
+		return false;
+	}
+
 	public function getMouseLock():Bool
 	{
 		return false;
@@ -600,6 +604,11 @@ class FlashWindow
 		frameRate = value;
 		if (parent.stage != null) parent.stage.frameRate = value;
 		return value;
+	}
+
+	public function setLimitFramerate(value:Bool):Bool
+	{
+		return false;
 	}
 
 	public function setFullscreen(value:Bool):Bool
@@ -642,6 +651,11 @@ class FlashWindow
 	public function setTitle(value:String):String
 	{
 		return value;
+	}
+
+	public function setVSync(value:Bool):Bool
+	{
+		return false;
 	}
 
 	public function setVisible(value:Bool):Bool

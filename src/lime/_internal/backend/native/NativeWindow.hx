@@ -45,6 +45,7 @@ class NativeWindow
 	private var cursor:MouseCursor;
 	private var displayMode:DisplayMode;
 	private var frameRate:Float;
+	private var limitFramerate:Bool;
 	private var mouseLock:Bool;
 	private var parent:Window;
 	private var useHardware:Bool;
@@ -289,6 +290,11 @@ class NativeWindow
 	public function getFrameRate():Float
 	{
 		return frameRate;
+	}
+
+	public function getLimitFramerate():Bool
+	{
+		return limitFramerate;
 	}
 
 	public function getMouseLock():Bool
@@ -608,6 +614,17 @@ class NativeWindow
 		return frameRate = value;
 	}
 
+	public function setLimitFramerate(value:Bool):Bool
+	{
+		if (handle != null){
+			#if (!macro && lime_cffi)
+			NativeCFFI.lime_application_limit_frame_rate(parent.application.__backend.handle, value);
+			#end
+		}
+
+		return limitFramerate = value;
+	}
+
 	public function setFullscreen(value:Bool):Bool
 	{
 		if (handle != null)
@@ -709,6 +726,18 @@ class NativeWindow
 		{
 			#if (!macro && lime_cffi)
 			NativeCFFI.lime_window_set_visible(handle, value);
+			#end
+		}
+
+		return value;
+	}
+
+	public function setVSync(value:Bool):Bool
+	{
+		if (handle != null)
+		{
+			#if (!macro && lime_cffi)
+			return NativeCFFI.lime_window_set_vsync(handle, value);
 			#end
 		}
 

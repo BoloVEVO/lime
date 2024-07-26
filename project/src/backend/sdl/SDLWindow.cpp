@@ -3,7 +3,7 @@
 #include "SDLApplication.h"
 #include "../../graphics/opengl/OpenGL.h"
 #include "../../graphics/opengl/OpenGLBindings.h"
-
+#include <SDL_hints.h>
 #ifdef HX_WINDOWS
 #include <SDL_syswm.h>
 #include <Windows.h>
@@ -76,6 +76,9 @@ namespace lime {
 		SDL_SetHint (SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
 		SDL_SetHint (SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 		#endif
+
+		SDL_SetHint (SDL_HINT_RENDER_LOGICAL_SIZE_MODE, "1");
+		SDL_SetHint (SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
 		if (flags & WINDOW_FLAG_HARDWARE) {
 
@@ -743,7 +746,7 @@ namespace lime {
 	void SDLWindow::Resize (int width, int height) {
 
 		SDL_SetWindowSize (sdlWindow, width, height);
-
+		SDL_RenderSetLogicalSize (sdlRenderer, width, height);
 	}
 
 
@@ -1123,6 +1126,13 @@ namespace lime {
 
 	}
 
+	bool SDLWindow::SetVSync (bool vsync) {
+
+		SDL_GL_SetSwapInterval(vsync ? 1 : 0);
+
+		return vsync;
+
+	}
 
 	void SDLWindow::WarpMouse (int x, int y) {
 
