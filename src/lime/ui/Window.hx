@@ -532,9 +532,9 @@ class Window
 		return __backend.setLimitFramerate(value);
 	}
 
-	@:noCompletion private inline function get_limitFramerate(value:Bool):Bool
+	@:noCompletion private inline function get_limitFramerate():Bool
 	{
-		return __backend.getLimitFramerate(value);
+		return __backend.getLimitFramerate();
 	}
 
 	@:noCompletion private inline function get_fullscreen():Bool
