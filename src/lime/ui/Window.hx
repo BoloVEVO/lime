@@ -98,6 +98,7 @@ class Window
 	public var textInputEnabled(get, set):Bool;
 	public var title(get, set):String;
 	public var visible(get, set):Bool;
+	public var vsync(get, set):Bool;
 	public var width(get, set):Int;
 	public var x(get, set):Int;
 	public var y(get, set):Int;

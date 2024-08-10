@@ -37,6 +37,8 @@ namespace lime {
 			virtual bool Update ();
 
 			void RegisterWindow (SDLWindow *window);
+			static double getCurrentTime();
+			static double getCurrentTime(double*);
 
 		private:
 
@@ -63,12 +65,14 @@ namespace lime {
 			ApplicationEvent applicationEvent;
 			ClipboardEvent clipboardEvent;
 			Uint64 currentUpdate;
+			Uint64 lastUpdate;
+			Uint64 frequency;
 			int fps;
 			DropEvent dropEvent;
 			GamepadEvent gamepadEvent;
 			JoystickEvent joystickEvent;
 			KeyEvent keyEvent;
-			Uint64 lastUpdate;
+			
 			MouseEvent mouseEvent;
 			RenderEvent renderEvent;
 			SensorEvent sensorEvent;

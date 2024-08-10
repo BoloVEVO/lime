@@ -49,8 +49,9 @@ namespace lime {
 
 		limitfps = true;
 
-		currentUpdate = 0.0;
-		lastUpdate = 0.0;
+		currentUpdate = 0;
+		lastUpdate = 0;
+		frequency = 0;
 
 		ApplicationEvent applicationEvent;
 		ClipboardEvent clipboardEvent;
@@ -552,6 +553,7 @@ namespace lime {
 
 			}
 
+
 			keyEvent.keyCode = event->key.keysym.sym;
 			keyEvent.modifier = event->key.keysym.mod;
 			keyEvent.windowID = event->key.windowID;
@@ -803,6 +805,13 @@ namespace lime {
 
 	}
 
+	double SDLApplication::getCurrentTime(){
+		Uint64 curUpdate = currentApplication->currentUpdate;
+		Uint64 freq = currentApplication->frequency;
+
+		return (double) curUpdate / (double) freq;
+	}
+
 
 	void SDLApplication::SetFrameRate (double frameRate) {
 		fps = static_cast<int>(abs(frameRate));
@@ -843,6 +852,7 @@ namespace lime {
 
 			firstTime = false;
 
+			frequency = SDL_GetPerformanceFrequency();
 			currentUpdate = SDL_GetPerformanceCounter();
 			HandleEvent (&event);
 			event.type = -1;
@@ -851,6 +861,7 @@ namespace lime {
 
 		#endif
 
+			frequency = SDL_GetPerformanceFrequency();
 			currentUpdate = SDL_GetPerformanceCounter();
 
 			while (SDL_PollEvent (&event)) {
@@ -864,36 +875,42 @@ namespace lime {
 			uint64_t curTicks = currentUpdate;
 
 			if (limitfps)
-			{
-				uint64_t frequency = SDL_GetPerformanceFrequency();
+			{		
 				int ticks_to_wait = static_cast<int>(frequency/fps);
 
 				bool done = false;
 
-				while(!done)
+				do
 				{
 					curTicks = SDL_GetPerformanceCounter();
 					int ticks_passed = static_cast<int>(curTicks-lastScheduledTicks);
 
 					int ticks_left = ticks_to_wait - ticks_passed;
 
-					if (curTicks < lastScheduledTicks)
-						done = true;
-
-					if (ticks_passed >= ticks_to_wait)
+					if (curTicks < lastScheduledTicks || ticks_passed >= ticks_to_wait)
 						done = true;
 
 					if (!done)
 					{
-						int scheduled_ticks = static_cast<int>((SDL_GetPerformanceFrequency()+499)/500);
+						int scheduled_ticks = static_cast<int>((frequency*2)*1e-3);
 
-						if (ticks_left >scheduled_ticks)
-							std::this_thread::sleep_for(std::chrono::milliseconds(1));
+						if (ticks_left > scheduled_ticks)
+							SDL_Delay(1);
 						else
-							for (int i=0;i<10;i++) // Give up time slice using sleep(0) 10 times
-								std::this_thread::sleep_for(std::chrono::milliseconds(0));
+						{								
+							uint64_t curTime = SDL_GetPerformanceCounter();
+
+							do {
+								curTicks = SDL_GetPerformanceCounter();
+								SDL_Delay(0);
+							}
+							while(curTicks-curTime < ticks_left);										
+						}
+							
 					}
 				}
+				while(!done);
+				
 
 				OnTimer();
 			}
