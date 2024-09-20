@@ -49,9 +49,9 @@ namespace lime {
 
 		limitfps = true;
 
+		frequency = SDL_GetPerformanceFrequency();
 		currentUpdate = 0;
 		lastUpdate = 0;
-		frequency = 0;
 
 		ApplicationEvent applicationEvent;
 		ClipboardEvent clipboardEvent;
@@ -876,7 +876,7 @@ namespace lime {
 
 			if (limitfps)
 			{		
-				int ticks_to_wait = static_cast<int>(frequency/fps);
+				int ticks_to_wait = static_cast<int>(frequency/(fps-0.5));
 
 				bool done = false;
 
