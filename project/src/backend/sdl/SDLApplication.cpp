@@ -875,8 +875,8 @@ namespace lime {
 			uint64_t curTicks = currentUpdate;
 
 			if (limitfps)
-			{		
-				int ticks_to_wait = static_cast<int>(frequency/(fps-0.5));
+			{
+				int ticks_to_wait = static_cast<int>(frequency/fps);
 
 				bool done = false;
 
@@ -897,20 +897,20 @@ namespace lime {
 						if (ticks_left > scheduled_ticks)
 							SDL_Delay(1);
 						else
-						{								
+						{
 							uint64_t curTime = SDL_GetPerformanceCounter();
 
 							do {
 								curTicks = SDL_GetPerformanceCounter();
 								SDL_Delay(0);
 							}
-							while(curTicks-curTime < ticks_left);										
+							while(curTicks-curTime < ticks_left);
 						}
-							
+
 					}
 				}
 				while(!done);
-				
+
 
 				OnTimer();
 			}
