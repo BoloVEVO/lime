@@ -12,8 +12,8 @@ import lime.math.Vector4;
 #end
 
 /**
-	The `AudioSource` class provides a way to control audio playback in a Lime application. 
-	It allows for playing, pausing, and stopping audio, as well as controlling various 
+	The `AudioSource` class provides a way to control audio playback in a Lime application.
+	It allows for playing, pausing, and stopping audio, as well as controlling various
 	audio properties such as gain, pitch, and looping.
 
 	Depending on the platform, the audio backend may vary, but the API remains consistent.
@@ -35,7 +35,7 @@ class AudioSource
 	/**
 		The current playback position of the audio, in milliseconds.
 	**/
-	public var currentTime(get, set):Int;
+	public var currentTime(get, set):Float;
 
 	/**
 		The gain (volume) of the audio. A value of `1.0` represents the default volume.
@@ -45,7 +45,7 @@ class AudioSource
 	/**
 		The length of the audio, in milliseconds.
 	**/
-	public var length(get, set):Int;
+	public var length(get, set):Float;
 
 	/**
 		The number of times the audio will loop. A value of `0` means the audio will not loop.

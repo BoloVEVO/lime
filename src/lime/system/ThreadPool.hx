@@ -389,57 +389,70 @@ class ThreadPool extends WorkOutput
 
 			while (true)
 			{
-				var output:WorkOutput = #if html5 new WorkOutput(MULTI_THREADED) #else cast(Thread.readMessage(true), WorkOutput) #end;
-				var event:ThreadEvent = null;
-
-				while (true)
+				// Get a job.
+				if (event == null)
 				{
-					// Get a job.
-					if (event == null)
+					do
 					{
-						do
-						{
-							event = Thread.readMessage(true);
-						}
-						while (!#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (event, ThreadEvent));
-
-						output.resetJobProgress();
+						event = Thread.readMessage(true);
 					}
 					while (event == null || !Reflect.hasField(event, "event"));
 
-					if (event.event == EXIT)
-					{
-						// Quit working.
-						#if html5
-						Thread.current().destroy();
-						#end
-						return;
-					}
+					output.resetJobProgress();
+				}
 
-					if (event.event != WORK || event.job == null)
-					{
-						// Go idle.
-						event = null;
-						continue;
-					}
+				if (event.event == EXIT)
+				{
+					// Quit working.
+					#if html5
+					Thread.current().destroy();
+					#end
+					return;
+				}
 
-					if (interruption == null || output.__jobComplete.value)
+				if (event.event != WORK || event.job == null)
+				{
+					// Go idle.
+					event = null;
+					continue;
+				}
+
+				// Get to work.
+				output.activeJob = event.job;
+
+				var interruption:Dynamic = null;
+				try
+				{
+					while (!output.__jobComplete.value && (interruption = Thread.readMessage(false)) == null)
 					{
-						// Work is done; wait for more.
-						event = interruption;
+						output.workIterations.value++;
+						event.job.doWork.dispatch(event.job.state, output);
 					}
-					else if (Reflect.hasField(interruption, "event"))
-					{
-						// Work on the new job.
-						event = interruption;
-						output.resetJobProgress();
-					}
-					else
-					{
-						// Ignore interruption and keep working.
-					}
-					// Do it all again.
-				}	
+				}
+				catch (e:#if (haxe_ver >= 4.1) haxe.Exception #else Dynamic #end)
+				{
+					output.sendError(e);
+				}
+
+				output.activeJob = null;
+
+				if (interruption == null || output.__jobComplete.value)
+				{
+					// Work is done; wait for more.
+					event = interruption;
+				}
+				else if (Reflect.hasField(interruption, "event"))
+				{
+					// Work on the new job.
+					event = interruption;
+					output.resetJobProgress();
+				}
+				else
+				{
+					// Ignore interruption and keep working.
+				}
+
+				// Do it all again.
 			}
 		});
 		// @formatter:on
@@ -798,7 +811,6 @@ class JobList
 		}
 		return null;
 	}
-
 	public inline function push(job:JobData):Void
 	{
 		__jobs.push(job);
