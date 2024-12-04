@@ -1,6 +1,16 @@
 Changelog
 =========
 
+8.2.1 (11/01/2024)
+------------------
+
+* Fixed `Sys.exit()` causing hang instead of exiting application.
+* Fixed paths for _.ndll_ files when targeting Raspberry Pi.
+* Fixed compiling `BackgroundWorker` when targeting HashLink before Haxe 4.
+* Fixed errors compiling `ThreadPool` for HashLink with Haxe 4.0 and 4.1.
+* Fixed `Font.renderGlyph` to support 32-bit colors, including alpha.
+* Fixed OpenFL line height issues by rolling back FreeType submodule to version 2.9.1.
+
 8.2.0 (10/21/2024)
 ------------------
 
