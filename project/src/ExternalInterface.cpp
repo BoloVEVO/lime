@@ -3653,6 +3653,19 @@ namespace lime {
 
 	}
 
+	bool lime_window_set_fullscreen_exclusive_mode (value window, bool exclusive) {
+
+		Window* targetWindow = (Window*)val_data (window);
+		return targetWindow->SetFullscreenExclusiveMode (exclusive);
+
+	}
+
+	HL_PRIM bool HL_NAME(hl_window_set_fullscreen_exclusive_mode) (HL_CFFIPointer* window, bool exclusive) {
+
+		Window* targetWindow = (Window*)window->ptr;
+		return targetWindow->SetFullscreenExclusiveMode (exclusive);
+
+	}
 
 	bool lime_window_set_fullscreen (value window, bool fullscreen) {
 
@@ -4091,6 +4104,7 @@ namespace lime {
 	DEFINE_PRIME2 (lime_window_set_borderless);
 	DEFINE_PRIME2v (lime_window_set_cursor);
 	DEFINE_PRIME2 (lime_window_set_display_mode);
+	DEFINE_PRIME2 (lime_window_set_fullscreen_exclusive_mode);
 	DEFINE_PRIME2 (lime_window_set_fullscreen);
 	DEFINE_PRIME2v (lime_window_set_icon);
 	DEFINE_PRIME2 (lime_window_set_maximized);
@@ -4282,6 +4296,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_VOID, hl_window_set_cursor, _TCFFIPOINTER _I32);
 	DEFINE_HL_PRIM (_VOID, hl_window_set_display_mode, _TCFFIPOINTER _TDISPLAYMODE _TDISPLAYMODE);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_fullscreen, _TCFFIPOINTER _BOOL);
+	DEFINE_HL_PRIM (_BOOL, hl_window_set_fullscreen_exclusive_mode, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_VOID, hl_window_set_icon, _TCFFIPOINTER _TIMAGEBUFFER);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_maximized, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_minimized, _TCFFIPOINTER _BOOL);

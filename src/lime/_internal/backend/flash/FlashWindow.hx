@@ -617,6 +617,11 @@ class FlashWindow
 		return value;
 	}
 
+	public function setFullscreenExclusiveMode(value:Bool):Bool
+	{
+		return false;
+	}
+
 	public function setIcon(image:Image):Void {}
 
 	public function setMaximized(value:Bool):Bool

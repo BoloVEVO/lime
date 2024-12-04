@@ -49,6 +49,7 @@ class Window
 	public var limitFramerate(get, set):Bool;
 
 	public var fullscreen(get, set):Bool;
+	public var fullscreenExclusiveMode(get,set):Bool;
 	public var height(get, set):Int;
 	public var hidden(get, null):Bool;
 	public var id(default, null):Int;
@@ -112,6 +113,7 @@ class Window
 	@:noCompletion private var __backend:WindowBackend;
 	@:noCompletion private var __borderless:Bool;
 	@:noCompletion private var __fullscreen:Bool;
+	@:noCompletion private var __fullscreenExclusiveMode:Bool;
 	@:noCompletion private var __height:Int;
 	@:noCompletion private var __hidden:Bool;
 	@:noCompletion private var __maximized:Bool;
@@ -547,6 +549,17 @@ class Window
 	{
 		return __fullscreen = __backend.setFullscreen(value);
 	}
+
+	@:noCompletion private inline function get_fullscreenExclusiveMode():Bool
+	{
+		return __fullscreenExclusiveMode;
+	}
+
+	@:noCompletion private function set_fullscreenExclusiveMode(value:Bool):Bool
+	{
+		return __fullscreenExclusiveMode = __backend.setFullscreenExclusiveMode(value);
+	}
+
 
 	@:noCompletion private inline function get_height():Int
 	{

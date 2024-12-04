@@ -951,9 +951,7 @@ namespace lime {
 
 		SDL_DisplayMode mode = { pixelFormat, displayMode->width, displayMode->height, displayMode->refreshRate, 0 };
 
-		if (SDL_SetWindowDisplayMode (sdlWindow, &mode) == 0) {
-
-			displayModeSet = true;
+		if (SDL_SetWindowDisplayMode (sdlWindow, &mode) == 0 && displayModeSet) {
 
 			if (SDL_GetWindowFlags (sdlWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) {
 
@@ -988,6 +986,22 @@ namespace lime {
 
 		return fullscreen;
 
+	}
+
+	bool SDLWindow::SetFullscreenExclusiveMode(bool exclusive)
+	{
+		displayModeSet = exclusive;
+
+		if (displayModeSet  && (SDL_GetWindowFlags (sdlWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP))
+		{
+			SDL_SetWindowFullscreen (sdlWindow, SDL_WINDOW_FULLSCREEN);
+		}
+		else if (SDL_GetWindowFlags (sdlWindow) & SDL_WINDOW_FULLSCREEN)
+		{
+			SDL_SetWindowFullscreen (sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		}
+
+		return displayModeSet;
 	}
 
 

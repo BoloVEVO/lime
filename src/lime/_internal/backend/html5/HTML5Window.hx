@@ -1125,6 +1125,11 @@ class HTML5Window
 		return value;
 	}
 
+	public function setFullscreenExclusiveMode(value:Bool):Bool
+	{
+		return false;
+	}
+
 	public function setIcon(image:Image):Void
 	{
 		// var iconWidth = 16;

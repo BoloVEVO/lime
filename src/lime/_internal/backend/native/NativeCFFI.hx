@@ -335,6 +335,8 @@ class NativeCFFI
 
 	@:cffi private static function lime_window_set_fullscreen(handle:Dynamic, fullscreen:Bool):Bool;
 
+	@:cffi private static function lime_window_set_fullscreen_exclusive_mode(handle:Dynamic, exclusive:Bool):Bool;
+
 	@:cffi private static function lime_window_set_icon(handle:Dynamic, buffer:Dynamic):Void;
 
 	@:cffi private static function lime_window_set_maximized(handle:Dynamic, maximized:Bool):Bool;
@@ -596,6 +598,8 @@ class NativeCFFI
 		"lime_window_set_display_mode", "ooo", false));
 	private static var lime_window_set_fullscreen = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_fullscreen", "obb",
 		false));
+	private static var lime_window_set_fullscreen_exclusive_mode = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_fullscreen_exclusive_mode", "obb",
+		false));
 	private static var lime_window_set_icon = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_window_set_icon", "oov",
 		false));
 	private static var lime_window_set_maximized = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_maximized", "obb",
@@ -766,6 +770,7 @@ class NativeCFFI
 	private static var lime_window_set_cursor = CFFI.load("lime", "lime_window_set_cursor", 2);
 	private static var lime_window_set_display_mode = CFFI.load("lime", "lime_window_set_display_mode", 2);
 	private static var lime_window_set_fullscreen = CFFI.load("lime", "lime_window_set_fullscreen", 2);
+	private static var lime_window_set_fullscreen_exclusive_mode = CFFI.load("lime", "lime_window_set_fullscreen_exclusive_mode", 2);
 	private static var lime_window_set_icon = CFFI.load("lime", "lime_window_set_icon", 2);
 	private static var lime_window_set_maximized = CFFI.load("lime", "lime_window_set_maximized", 2);
 	private static var lime_window_set_minimized = CFFI.load("lime", "lime_window_set_minimized", 2);
@@ -1343,6 +1348,11 @@ class NativeCFFI
 		result:DisplayMode):Void {}
 
 	@:hlNative("lime", "hl_window_set_fullscreen") private static function lime_window_set_fullscreen(handle:CFFIPointer, fullscreen:Bool):Bool
+	{
+		return false;
+	}
+
+	@:hlNative("lime", "hl_window_set_fullscreen_exclusive_mode") private static function lime_window_set_fullscreen_exclusive_mode(handle:CFFIPointer, exclusive:Bool):Bool
 	{
 		return false;
 	}
