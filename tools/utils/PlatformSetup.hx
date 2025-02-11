@@ -816,11 +816,6 @@ class PlatformSetup
 			setupHaxelib(new Haxelib("lime"));
 		}
 
-		if (System.hostPlatform == MAC)
-		{
-			ConfigHelper.writeConfigValue("MAC_USE_CURRENT_SDK", "1");
-		}
-
 		if (targetFlags.exists("noalias"))
 		{
 			return;
@@ -880,13 +875,16 @@ class PlatformSetup
 			var installedCommand = false;
 			var answer = YES;
 
-			if (targetFlags.exists("y"))
+			if (!(targetFlags.exists("alias") || targetFlags.exists("cli")))
 			{
-				Sys.println("Do you want to install the \"lime\" command? [y/n/a] y");
-			}
-			else
-			{
-				answer = CLIHelper.ask("Do you want to install the \"lime\" command?");
+				if (targetFlags.exists("y"))
+				{
+					Sys.println("Do you want to install the \"lime\" command? [y/n/a] y");
+				}
+				else
+				{
+					answer = CLIHelper.ask("Do you want to install the \"lime\" command?");
+				}
 			}
 
 			if (answer == YES || answer == ALWAYS)
@@ -1079,11 +1077,6 @@ class PlatformSetup
 			setupHaxelib(new Haxelib("openfl"));
 		}
 
-		if (System.hostPlatform == MAC)
-		{
-			ConfigHelper.writeConfigValue("MAC_USE_CURRENT_SDK", "1");
-		}
-
 		if (targetFlags.exists("noalias"))
 		{
 			return;
@@ -1133,13 +1126,16 @@ class PlatformSetup
 			var installedCommand = false;
 			var answer = YES;
 
-			if (targetFlags.exists("y"))
+			if (!(targetFlags.exists("alias") || targetFlags.exists("cli")))
 			{
-				Sys.println("Do you want to install the \"openfl\" command? [y/n/a] y");
-			}
-			else
-			{
-				answer = CLIHelper.ask("Do you want to install the \"openfl\" command?");
+				if (targetFlags.exists("y"))
+				{
+					Sys.println("Do you want to install the \"openfl\" command? [y/n/a] y");
+				}
+				else
+				{
+					answer = CLIHelper.ask("Do you want to install the \"openfl\" command?");
+				}
 			}
 
 			if (answer == YES || answer == ALWAYS)
