@@ -2068,17 +2068,7 @@ namespace lime {
 
 		} else {
 
-			if (!alphaPoint) {
-
-				Vector2 _alphaPoint = Vector2 (0, 0);
-
-				ImageDataUtil::CopyPixels (image, sourceImage, sourceRect, destPoint, alphaImage, &_alphaPoint, mergeAlpha);
-
-			} else {
-
-				ImageDataUtil::CopyPixels (image, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
-
-			}
+			ImageDataUtil::CopyPixels (image, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
 
 		}
 
@@ -2712,6 +2702,18 @@ namespace lime {
 
 	}
 
+	int lime_sdl_get_ticks () {
+
+		return System::GetTicks ();
+
+	}
+
+
+	HL_PRIM int HL_NAME(hl_sdl_get_ticks) () {
+
+		return System::GetTicks ();
+
+	}
 
 	bool lime_system_get_allow_screen_timeout () {
 
@@ -4067,6 +4069,7 @@ namespace lime {
 	DEFINE_PRIME3 (lime_png_decode_file);
 	DEFINE_PRIME2v (lime_render_event_manager_register);
 	DEFINE_PRIME2v (lime_sensor_event_manager_register);
+	DEFINE_PRIME0 (lime_sdl_get_ticks);
 	DEFINE_PRIME0 (lime_system_get_allow_screen_timeout);
 	DEFINE_PRIME0 (lime_system_get_device_model);
 	DEFINE_PRIME0 (lime_system_get_device_vendor);
@@ -4272,6 +4275,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_I32, hl_system_get_windows_console_mode, _I32);
 	DEFINE_HL_PRIM (_VOID, hl_system_open_file, _STRING);
 	DEFINE_HL_PRIM (_VOID, hl_system_open_url, _STRING _STRING);
+	DEFINE_HL_PRIM (_I64, hl_sdl_get_ticks, _FUN (_VOID, _NO_ARG) _TRENDER_EVENT);
 	DEFINE_HL_PRIM (_BOOL, hl_system_set_allow_screen_timeout, _BOOL);
 	DEFINE_HL_PRIM (_BOOL, hl_system_set_windows_console_mode, _I32 _I32);
 	DEFINE_HL_PRIM (_VOID, hl_text_event_manager_register, _FUN (_VOID, _NO_ARG) _TTEXT_EVENT);

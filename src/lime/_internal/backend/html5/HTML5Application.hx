@@ -14,6 +14,7 @@ import lime.ui.Gamepad;
 import lime.ui.GamepadButton;
 import lime.ui.Joystick;
 import lime.ui.Window;
+import haxe.Int64;
 
 @:access(lime._internal.backend.html5.HTML5Window)
 @:access(lime.app.Application)
@@ -412,12 +413,14 @@ class HTML5Application
 
 			var keyCode = cast convertKeyCode(event.keyCode != null ? event.keyCode : event.which);
 			var modifier = (event.shiftKey ? (KeyModifier.SHIFT) : 0) | (event.ctrlKey ? (KeyModifier.CTRL) : 0) | (event.altKey ? (KeyModifier.ALT) : 0) | (event.metaKey ? (KeyModifier.META) : 0);
+			var timestamp:Int64 = keyEventInfo.timestamp;
 
 			if (event.type == "keydown")
 			{
 				parent.window.onKeyDown.dispatch(keyCode, modifier);
+				parent.window.onKeyDownPrecise.dispatch(keyCode, modifier, timestamp);
 
-				if (parent.window.onKeyDown.canceled && event.cancelable)
+				if ((parent.window.onKeyDown.canceled || parent.window.onKeyDownPrecise.canceled)&& event.cancelable)
 				{
 					event.preventDefault();
 				}
@@ -425,8 +428,9 @@ class HTML5Application
 			else
 			{
 				parent.window.onKeyUp.dispatch(keyCode, modifier);
+				parent.window.onKeyUpPrecise.dispatch(keyCode, modifier, timestamp);
 
-				if (parent.window.onKeyUp.canceled && event.cancelable)
+				if ((parent.window.onKeyUp.canceled || parent.window.onKeyUpPrecise.canceled) && event.cancelable)
 				{
 					event.preventDefault();
 				}

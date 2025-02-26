@@ -15,6 +15,7 @@ import lime.ui.Touch;
 import lime.ui.Window;
 import lime.ui.WindowAttributes;
 import lime.utils.Preloader;
+import haxe.Int64;
 
 /**
 	The Application class forms the foundation for most Lime projects.
@@ -239,6 +240,22 @@ class Application extends Module
 		@param	modifier	The modifier of the key that was released
 	**/
 	public function onKeyUp(keyCode:KeyCode, modifier:KeyModifier):Void {}
+
+	/**
+		Called when a key down event is fired on the primary window
+		@param	keyCode	The code of the key that was pressed
+		@param	modifier	The modifier of the key that was pressed
+		@param	timestamp 	The timestamp of the event
+	**/
+	public function onKeyDownPrecise(keyCode:KeyCode, modifier:KeyModifier, timestamp:Int64):Void {}
+
+	/**
+		Called when a key up event is fired on the primary window
+		@param	keyCode	The code of the key that was released
+		@param	modifier	The modifier of the key that was released
+		@param	timestamp 	The timestamp of the event
+	**/
+	public function onKeyUpPrecise(keyCode:KeyCode, modifier:KeyModifier, timestamp:Int64):Void {}
 
 	/**
 		Called when the module is exiting

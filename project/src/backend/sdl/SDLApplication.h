@@ -39,6 +39,7 @@ namespace lime {
 			void RegisterWindow (SDLWindow *window);
 			static double getCurrentTime();
 			static double getCurrentTime(double*);
+			static uint64_t getStartTime();
 
 		private:
 
@@ -67,6 +68,7 @@ namespace lime {
 			Uint64 currentUpdate;
 			Uint64 lastUpdate;
 			Uint64 frequency;
+			Uint64 startTime;
 			int fps;
 			DropEvent dropEvent;
 			GamepadEvent gamepadEvent;

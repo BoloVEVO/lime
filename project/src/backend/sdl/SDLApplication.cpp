@@ -324,7 +324,8 @@ namespace lime {
 		active = true;
 
 		uint64_t ticks = SDL_GetPerformanceCounter();
-
+		startTime = ticks;
+		
 		lastUpdate = ticks;
 		lastUpdateEvent = lastUpdate;
 		lastScheduledTicks = ticks;
@@ -557,6 +558,7 @@ namespace lime {
 			keyEvent.keyCode = event->key.keysym.sym;
 			keyEvent.modifier = event->key.keysym.mod;
 			keyEvent.windowID = event->key.windowID;
+			keyEvent.timestamp = event->key.timestamp;
 
 			if (keyEvent.type == KEY_DOWN) {
 
@@ -805,6 +807,12 @@ namespace lime {
 
 	}
 
+	uint64_t SDLApplication::getStartTime(){
+		Uint64 startTime = currentApplication->startTime;
+
+		return startTime;
+	}
+
 	double SDLApplication::getCurrentTime(){
 		Uint64 curUpdate = currentApplication->currentUpdate;
 		Uint64 freq = currentApplication->frequency;
@@ -853,7 +861,7 @@ namespace lime {
 			firstTime = false;
 
 			frequency = SDL_GetPerformanceFrequency();
-			currentUpdate = SDL_GetPerformanceCounter();
+			currentUpdate = SDL_GetPerformanceCounter()-startTime;
 			HandleEvent (&event);
 			event.type = -1;
 			if (!active)
@@ -862,7 +870,7 @@ namespace lime {
 		#endif
 
 			frequency = SDL_GetPerformanceFrequency();
-			currentUpdate = SDL_GetPerformanceCounter();
+			currentUpdate = SDL_GetPerformanceCounter()-startTime;
 
 			while (SDL_PollEvent (&event)) {
 
@@ -882,7 +890,7 @@ namespace lime {
 
 				do
 				{
-					curTicks = SDL_GetPerformanceCounter();
+					curTicks = SDL_GetPerformanceCounter()-startTime;
 					int ticks_passed = static_cast<int>(curTicks-lastScheduledTicks);
 
 					int ticks_left = ticks_to_wait - ticks_passed;
@@ -898,10 +906,10 @@ namespace lime {
 							SDL_Delay(1);
 						else
 						{
-							uint64_t curTime = SDL_GetPerformanceCounter();
+							uint64_t curTime = SDL_GetPerformanceCounter()-startTime;
 
 							do {
-								curTicks = SDL_GetPerformanceCounter();
+								curTicks = SDL_GetPerformanceCounter()-startTime;
 								SDL_Delay(0);
 							}
 							while(curTicks-curTime < ticks_left);

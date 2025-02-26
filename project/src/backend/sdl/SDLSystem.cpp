@@ -547,13 +547,20 @@ namespace lime {
 
 
 	double System::GetTimer () {
-		uint64_t ticks = SDL_GetPerformanceCounter();
+		uint64_t ticks = SDL_GetPerformanceCounter()-SDLApplication::getStartTime();
 		uint64_t frequency = SDL_GetPerformanceFrequency();
 		double seconds = (double)ticks / (double)frequency;
 		
 		return seconds*1000;
 	}
 
+
+	long System::GetTicks () {
+
+		return SDL_GetTicks ();
+
+	}
+	
 
 	bool System::SetAllowScreenTimeout (bool allow) {
 
