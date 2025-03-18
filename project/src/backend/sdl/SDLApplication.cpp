@@ -325,7 +325,7 @@ namespace lime {
 
 		uint64_t ticks = SDL_GetPerformanceCounter();
 		startTime = ticks;
-		
+
 		lastUpdate = ticks;
 		lastUpdateEvent = lastUpdate;
 		lastScheduledTicks = ticks;
@@ -808,12 +808,18 @@ namespace lime {
 	}
 
 	uint64_t SDLApplication::getStartTime(){
+		if (currentApplication == NULL)
+			return 0;
+
 		Uint64 startTime = currentApplication->startTime;
 
 		return startTime;
 	}
 
 	double SDLApplication::getCurrentTime(){
+		if (currentApplication == NULL)
+			return 0;
+
 		Uint64 curUpdate = currentApplication->currentUpdate;
 		Uint64 freq = currentApplication->frequency;
 
