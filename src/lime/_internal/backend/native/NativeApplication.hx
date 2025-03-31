@@ -255,7 +255,8 @@ class NativeApplication
 			var int32:Float = keyEventInfo.keyCode;
 			var keyCode:KeyCode = Std.int(int32);
 			var modifier:KeyModifier = keyEventInfo.modifier;
-			var timestamp:Int64 = keyEventInfo.timestamp;
+			var float_timestamp:Float = keyEventInfo.timestamp;
+			var timestamp:Int64 = Int64.fromFloat(float_timestamp);
 
 			switch (type)
 			{
@@ -434,8 +435,7 @@ class NativeApplication
 					window.onTextInput.dispatch(CFFI.stringValue(textEventInfo.text));
 
 				case TEXT_EDIT:
-					window.onTextEdit.dispatch(CFFI.stringValue(textEventInfo.text), textEventInfo.start,
-						textEventInfo.length);
+					window.onTextEdit.dispatch(CFFI.stringValue(textEventInfo.text), textEventInfo.start, textEventInfo.length);
 
 				default:
 			}
@@ -645,7 +645,6 @@ class NativeApplication
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract ApplicationEventType(Int)
 {
 	var UPDATE = 0;
@@ -668,7 +667,6 @@ private #end abstract ApplicationEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract ClipboardEventType(Int)
 {
 	var UPDATE = 0;
@@ -692,7 +690,6 @@ private #end abstract ClipboardEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract DropEventType(Int)
 {
 	var DROP_FILE = 0;
@@ -722,7 +719,6 @@ private #end abstract DropEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract GamepadEventType(Int)
 {
 	var AXIS_MOVE = 0;
@@ -758,7 +754,6 @@ private #end abstract GamepadEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract JoystickEventType(Int)
 {
 	var AXIS_MOVE = 0;
@@ -775,15 +770,15 @@ private #end abstract JoystickEventType(Int)
 	public var modifier:Int;
 	public var type:KeyEventType;
 	public var windowID:Int;
-	public var timestamp:Int64;
+	public var timestamp:Float;
 
-	public function new(type:KeyEventType = null, windowID:Int = 0, keyCode: Float = 0, modifier:Int = 0, timestamp:Null<Int64> = null)
+	public function new(type:KeyEventType = null, windowID:Int = 0, keyCode:Float = 0, modifier:Int = 0, timestamp:Float = 0)
 	{
 		this.type = type;
 		this.windowID = windowID;
 		this.keyCode = keyCode;
 		this.modifier = modifier;
-		this.timestamp = timestamp == null ? Int64.ofInt(0) : timestamp;
+		this.timestamp = timestamp;
 	}
 
 	public function clone():KeyEventInfo
@@ -793,7 +788,6 @@ private #end abstract JoystickEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract KeyEventType(Int)
 {
 	var KEY_DOWN = 0;
@@ -831,7 +825,6 @@ private #end abstract KeyEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract MouseEventType(Int)
 {
 	var MOUSE_DOWN = 0;
@@ -856,7 +849,6 @@ private #end abstract MouseEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract RenderEventType(Int)
 {
 	var RENDER = 0;
@@ -888,7 +880,6 @@ private #end abstract RenderEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract SensorEventType(Int)
 {
 	var ACCELEROMETER = 0;
@@ -919,7 +910,6 @@ private #end abstract SensorEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract TextEventType(Int)
 {
 	var TEXT_INPUT = 0;
@@ -956,7 +946,6 @@ private #end abstract TextEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract TouchEventType(Int)
 {
 	var TOUCH_START = 0;
@@ -990,7 +979,6 @@ private #end abstract TouchEventType(Int)
 }
 
 #if (haxe_ver >= 4.0) private enum #else @:enum
-
 private #end abstract WindowEventType(Int)
 {
 	var WINDOW_ACTIVATE = 0;
