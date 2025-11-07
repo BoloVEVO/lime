@@ -21,7 +21,7 @@ namespace lime {
 			virtual void Init () = 0;
 			virtual int Quit () = 0;
 			virtual void SetFrameRate (double frameRate) = 0;
-			virtual void LimitFPS (bool limit) = false;
+			virtual void LimitFPS (bool limit) = 0;
 			virtual bool Update () = 0;
 
 
