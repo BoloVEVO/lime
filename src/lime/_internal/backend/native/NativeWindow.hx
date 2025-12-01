@@ -133,6 +133,7 @@ class NativeWindow
 				var gl = new NativeOpenGLRenderContext();
 
 				useHardware = true;
+				contextAttributes.hardware = true;
 
 				#if lime_opengl
 				context.gl = gl;
@@ -156,6 +157,7 @@ class NativeWindow
 
 			default:
 				useHardware = false;
+				contextAttributes.hardware = false;
 
 				#if lime_cairo
 				context.cairo = cairo;
@@ -354,7 +356,10 @@ class NativeWindow
 				var windowWidth = Std.int(parent.__width * parent.__scale);
 				var windowHeight = Std.int(parent.__height * parent.__scale);
 
-				var x, y, width, height;
+				var x:Int;
+				var y:Int;
+				var width:Int;
+				var height:Int;
 
 				if (rect != null)
 				{

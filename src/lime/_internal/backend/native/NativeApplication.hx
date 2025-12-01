@@ -1,11 +1,12 @@
 package lime._internal.backend.native;
 
+import haxe.Int64;
 import haxe.Timer;
 import lime._internal.backend.native.NativeCFFI;
 import lime.app.Application;
-import lime.graphics.opengl.GL;
 import lime.graphics.OpenGLRenderContext;
 import lime.graphics.RenderContext;
+import lime.graphics.opengl.GL;
 import lime.math.Rectangle;
 import lime.media.AudioManager;
 import lime.system.CFFI;
@@ -13,6 +14,7 @@ import lime.system.Clipboard;
 import lime.system.Display;
 import lime.system.DisplayMode;
 import lime.system.JNI;
+import lime.system.Orientation;
 import lime.system.Sensor;
 import lime.system.SensorType;
 import lime.system.System;
@@ -23,7 +25,6 @@ import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 import lime.ui.Touch;
 import lime.ui.Window;
-import haxe.Int64;
 
 #if !lime_debug
 @:fileXml('tags="haxe,release"')
@@ -51,6 +52,7 @@ class NativeApplication
 	private var gamepadEventInfo = new GamepadEventInfo();
 	private var joystickEventInfo = new JoystickEventInfo();
 	private var keyEventInfo = new KeyEventInfo();
+	private var orientationEventInfo = new OrientationEventInfo();
 	private var mouseEventInfo = new MouseEventInfo();
 	private var renderEventInfo = new RenderEventInfo(RENDER);
 	private var sensorEventInfo = new SensorEventInfo();
@@ -60,6 +62,10 @@ class NativeApplication
 	private var windowEventInfo = new WindowEventInfo();
 
 	public var handle:Dynamic;
+
+	#if android
+	private var deviceOrientationListener:OrientationChangeListener;
+	#end
 
 	private var pauseTimer:Int;
 	private var parent:Application;
@@ -84,6 +90,13 @@ class NativeApplication
 		Sensor.registerSensor(SensorType.ACCELEROMETER, 0);
 		#end
 
+		#if android
+		var setDeviceOrientationListener = JNI.createStaticMethod("org/haxe/lime/GameActivity", "setDeviceOrientationListener",
+			"(Lorg/haxe/lime/HaxeObject;)V");
+		deviceOrientationListener = new OrientationChangeListener(handleJNIOrientationEvent);
+		setDeviceOrientationListener(deviceOrientationListener);
+		#end
+
 		#if (!macro && lime_cffi)
 		handle = NativeCFFI.lime_application_create();
 		#end
@@ -95,9 +108,9 @@ class NativeApplication
 		if (pauseTimer > -1)
 		{
 			var offset = System.getTimer() - pauseTimer;
-			for (i in 0...Timer.sRunningTimers.length)
+			for (timer in Timer.sRunningTimers)
 			{
-				if (Timer.sRunningTimers[i] != null) Timer.sRunningTimers[i].mFireAt += offset;
+				if (timer.mRunning) timer.mFireAt += offset;
 			}
 			pauseTimer = -1;
 		}
@@ -119,6 +132,9 @@ class NativeApplication
 		NativeCFFI.lime_text_event_manager_register(handleTextEvent, textEventInfo);
 		NativeCFFI.lime_touch_event_manager_register(handleTouchEvent, touchEventInfo);
 		NativeCFFI.lime_window_event_manager_register(handleWindowEvent, windowEventInfo);
+		#if (ios || android)
+		NativeCFFI.lime_orientation_event_manager_register(handleOrientationEvent, orientationEventInfo);
+		#end
 		#if (ios || android || tvos)
 		NativeCFFI.lime_sensor_event_manager_register(handleSensorEvent, sensorEventInfo);
 		#end
@@ -164,6 +180,15 @@ class NativeApplication
 
 		#if (!macro && lime_cffi)
 		NativeCFFI.lime_application_quit(handle);
+		#end
+	}
+
+	public function getDeviceOrientation():Orientation
+	{
+		#if (!macro && lime_cffi)
+		return cast NativeCFFI.lime_system_get_device_orientation();
+		#else
+		return UNKNOWN;
 		#end
 	}
 
@@ -357,6 +382,27 @@ class NativeApplication
 			}
 		}
 	}
+
+	private function handleOrientationEvent():Void
+	{
+		var orientation:Orientation = cast orientationEventInfo.orientation;
+		var display = orientationEventInfo.display;
+		switch (orientationEventInfo.type)
+		{
+			case DISPLAY_ORIENTATION_CHANGE:
+				parent.onDisplayOrientationChange.dispatch(display, orientation);
+			case DEVICE_ORIENTATION_CHANGE:
+				parent.onDeviceOrientationChange.dispatch(orientation);
+		}
+	}
+
+	#if android
+	private function handleJNIOrientationEvent(newOrientation:Int):Void
+	{
+		var orientation:Orientation = cast newOrientation;
+		parent.onDeviceOrientationChange.dispatch(orientation);
+	}
+	#end
 
 	private function handleRenderEvent():Void
 	{
@@ -582,16 +628,13 @@ class NativeApplication
 		if (Timer.sRunningTimers.length > 0)
 		{
 			var currentTime = System.getTimer();
-			var foundNull = false;
-			var timer;
+			var foundStopped = false;
 
-			for (i in 0...Timer.sRunningTimers.length)
+			for (timer in Timer.sRunningTimers)
 			{
-				timer = Timer.sRunningTimers[i];
-
-				if (timer != null)
+				if (timer.mRunning)
 				{
-					if (timer.mRunning && currentTime >= timer.mFireAt)
+					if (currentTime >= timer.mFireAt)
 					{
 						timer.mFireAt += timer.mTime;
 						timer.run();
@@ -599,15 +642,15 @@ class NativeApplication
 				}
 				else
 				{
-					foundNull = true;
+					foundStopped = true;
 				}
 			}
 
-			if (foundNull)
+			if (foundStopped)
 			{
 				Timer.sRunningTimers = Timer.sRunningTimers.filter(function(val)
 				{
-					return val != null;
+					return val.mRunning;
 				});
 			}
 		}
@@ -997,3 +1040,46 @@ private #end abstract WindowEventType(Int)
 	var WINDOW_SHOW = 13;
 	var WINDOW_HIDE = 14;
 }
+
+@:keep /*private*/ class OrientationEventInfo
+{
+	public var orientation:Int;
+	public var display:Int;
+	public var type:OrientationEventType;
+
+	public function new(type:OrientationEventType = null, orientation:Int = 0, display:Int = -1)
+	{
+		this.type = type;
+		this.orientation = orientation;
+		this.display = display;
+	}
+
+	public function clone():OrientationEventInfo
+	{
+		return new OrientationEventInfo(type, orientation, display);
+	}
+}
+
+#if (haxe_ver >= 4.0) private enum #else @:enum private #end abstract OrientationEventType(Int)
+{
+	var DISPLAY_ORIENTATION_CHANGE = 0;
+	var DEVICE_ORIENTATION_CHANGE = 1;
+}
+
+#if android
+private class OrientationChangeListener implements JNISafety
+{
+	private var callback:Int->Void;
+
+	public function new(callback:Int->Void)
+	{
+		this.callback = callback;
+	}
+
+	@:runOnMainThread
+	public function onOrientationChanged(orientation:Int):Void
+	{
+		callback(orientation);
+	}
+}
+#end
